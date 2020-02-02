@@ -1,0 +1,82 @@
+void test_process()
+{
+	bool passed = true;
+	bool betterpass = true;
+	bool truepass = true;
+	for(int i = 1; i <= 65; i++){
+		
+		printf("Testing %d bytes\n",i);
+		char *src = new char[i];
+		char *dst = new char[i];
+		const char value = i;
+
+		memset(src, value, i);
+		passed = true;
+		for(int j = 0; j < i; j++){
+			if(src[j]!=value){
+				printf("error in byte %d\n\tshould have been %d but was %d\n", j, value, src[j]);
+				passed = false;
+				betterpass = false;
+			}
+		}
+		if(passed){
+			printf("\tPassed memset test of %d bytes\n", i);
+		}else{
+			printf("\tFailed memset test of %d bytes\n", i);
+		}
+
+		memcpy(dst,src,i);
+		passed = true;
+		for(int j = 0; j < i; j++){
+			if(dst[j]!=src[j]){
+				printf("error in byte %d\n\tshould have been %d but was %d\n", j, src[j], dst[j]);
+				passed = false;
+				betterpass = false;
+			}
+		}
+
+		if(passed){
+			printf("\tPassed memcpy test of %d bytes\n", i);
+		}else{
+			printf("\tFailed memcpy test of %d bytes\n", i);
+		}
+
+		delete src;
+		delete dst;
+	}
+	if(truepass){
+		printf("\nPassed all memset and constant memcpy tests\n\n");
+	}else{
+		printf("\nFailed 1 or more memset or memcpy test\n\n");
+	}
+
+	void *tester = new long[2];
+	*(unsigned long*)tester = 0x76543210;
+	*(unsigned long*)(tester+4) = 0xfedcba98;
+	*(unsigned long*)(tester+8) = 0x76543210;
+	*(unsigned long*)(tester+12) = 0xfedcba98;
+	printf("You should see the number counting up twice, 2 at a time\n");
+	for(int i = 1; i <= 16; i++){
+		char *dst = new char[16];
+		memcpy(dst,tester,i);
+		printf("\t0x%08x%08x%08x%08x\n", *(unsigned long*)(dst+12), *(unsigned long*)(dst+8), *(unsigned long*)(dst+4), *(unsigned long*)dst);
+		delete dst;
+	}
+
+	//You should comment this out if you don't care how fast the test runs
+	//Marz's code runs this in ~2:04
+	//Shoot for ~1:40 it's not that hard and I believe in you
+	//My best is ~0:40
+	char *big = new char[10000000];
+	char *bigdst = new char[10000000];
+	printf("staring big memset\n");
+	memset(big, 'z', 10000000);
+	printf("staring big memcpy set\n");
+	for(int i = 0; i < 3000; i++){
+		if(i%1000 == 0){
+			printf("\tfinished with %d\n",i);
+		}
+		memcpy(bigdst, big, 10000000);
+	}
+	printf("done");
+}
